@@ -14,7 +14,11 @@
           buildInputs = [
             inp.foundry.defaultPackage.${system}
             inp.act.packages.${system}.default
+            pkgs.solc
           ];
+          shellHook = ''
+            DAPP_SOLC=${solc}
+          '';
         };
       });
 }
