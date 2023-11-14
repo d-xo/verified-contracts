@@ -39,6 +39,7 @@ contract ERC20 {
     constructor(string memory symbol_, string memory name_) {
         symbol = symbol_;
         name   = name_;
+        wards[msg.sender] = true;
     }
 
     // --- Token ---
