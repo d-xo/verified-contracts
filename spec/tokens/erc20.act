@@ -1,83 +1,101 @@
-constructor of Token
-interface constructor(string _symbol, string _name, uint _totalSupply)
+contract ERC20 {
 
-creates
+  // --- state ---
 
-  string name         := _name
-  string symbol       := _symbol
-  uint256 totalSupply := _totalSupply
-  mapping(address => uint) balanceOf := []
-  mapping(address => mapping(address => uint)) allowance := []
-  mapping(address => bool) wards := [CALLER := true]
+  layout {
+    string name
+    string symbol
+    uint256 totalSupply
+    mapping(address => uint) balanceOf
+    mapping(address => mapping(address => uint)) allowance
+    mapping(address => bool) wards
+  }
 
-invariants
+  func constructor(string _symbol, string _name) {
+    storage {
+      name        <- _name
+      symbol      <- _symbol
+      totalSupply <- 0
+      balanceOf   <- []
+      allowance   <- []
+      wards       <- [CALLER := true]
+    }
+  }
 
-  totalSupply == _totalSupply
-  symbol == _symbol
-  name == _name
+  // --- erc20 ---
 
-behaviour transfer of Token
-interface transfer(uint256 value, address to)
+  func transfer(address dst, uint256 amt) -> bool {
+    case CALLER == to {
+      iff inrange(uint256, balanceOf[CALLER] - amt)
+      returns true
+    }
+    case CALLER =/= to {
+      move(src, dst, amt)
+      returns true
+    }
+  }
 
-iff
+  func transferFrom(address src, address dst, uint amt) -> bool {
+    case src == dst {
+      iff inrange(uint256, balanceOf[src] - amt)
+      returns true
+    }
+    case src =/= dst and CALLER == src {
+      storage {
+        balanceOf[src] = balanceOf[src] - amt
+        balanceOf[dst] = balanceOf[dst] + amt
+      }
+      returns true
+    }
+    case src =/= dst and CALLER =/= src and allowance[src][CALLER] == MAX_UINT {
+      storage {
+        balanceOf[src] = balanceOf[src] - amt
+        balanceOf[dst] = balanceOf[dst] + amt
+      }
+      returns true
+    }
+    case src =/= dst and CALLER =/= src and allowance[src][CALLER] < MAX_UINT {
+      storage {
+        allowance[src][CALLER] <- allowance[src][CALLER] - amt
+        balanceOf[src] = balanceOf[src] - amt
+        balanceOf[dst] = balanceOf[dst] + amt
+      }
+      returns true
+    }
+  }
 
-  CALLVALUE == 0
-  value <= balanceOf[CALLER]
-  CALLER =/= to => balanceOf[to] + value < 2^256
+  func approve(address usr, uint amt) -> bool {
+    storage allowance[msg.sender][usr] = amt
+    returns true
+  }
 
-case CALLER =/= to:
+  // --- admin ---
 
-  storage
+  func mint(address usr, uint amt) {
+    iff wards[usr]
+    storage {
+      balanceOf[usr] <- balanceOf[usr] + amt
+      totalSupply <- totalSupply + amt
+    }
+  }
 
-     balanceOf[CALLER] => balanceOf[CALLER] - value
-     balanceOf[to]     => balanceOf[to] + value
+  func burn(address usr, uint amt) {
+    iff wards[msg.sender] || usr == msg.sender
+    storage {
+      balanceOf[usr] <- balanceOf[usr] - amt
+      totalSupply <- totalSupply - amt
+    }
+  }
 
-  returns 1
+  // --- auth ---
 
-case CALLER == to:
+  func rely(address usr) {
+    iff wards[msg.sender]
+    storage wards[usr] <- true
+  }
 
-  returns 1
-
-
-behaviour transferFrom of Token
-interface transferFrom(address src, address dst, uint amount)
-
-iff
-
-  amount <= balanceOf[CALLER]
-  src    =/= dst => balanceOf[dst] + amount < 2^256
-  CALLER =/= src => 0 <= allowance[src][CALLER] - amount
-  CALLVALUE == 0
-
-case src =/= dst and CALLER == src:
-
-  storage
-
-     balanceOf[src] => balanceOf[src] - amount
-     balanceOf[dst] => balanceOf[dst] + amount
-
-  returns 1
-
-case src =/= dst and CALLER =/= src and allowance[src][CALLER] == 2^256 - 1:
-
-  storage
-
-     balanceOf[src] => balanceOf[src] - amount
-     balanceOf[dst] => balanceOf[dst] + amount
-
-  returns 1
-
-case src =/= dst and CALLER =/= src and allowance[src][CALLER] < 2^256 - 1:
-
-  storage
-
-    allowance[src][CALLER] => allowance[src][CALLER] - amount
-    balanceOf[src]         => balanceOf[src] - amount
-    balanceOf[dst]         => balanceOf[dst] + amount
-
-  returns 1
-
-case src == dst:
-
-  returns 1
-
+  func deny(address usr) {
+    iff wards[msg.sender]
+    storage wards[usr] <- false
+  }
+}
