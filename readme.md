@@ -7,17 +7,20 @@ development of the tool.
 
 We aim to eventually include the following contracts:
 
+```
 - tokens
-  - erc20
-  - erc721
-  - erc6909
+  - erc20   : erc20 with admin controlled mint/burn
+  - erc721  : nft contract
+  - erc6909 : multi-token contract
 - utilities
-  - fixed point (wad/ray) math
-  - merkle proof verification
+  - wards   : multi-user auth
+  - math    : fixed point (wad/ray) math
+  - merkle  : merkle proof verification
 - apps
-  - amm   : uni-v2 style amm
-  - synth : collateral backed synthetic asset
-  - sell  : nft auction
+  - amm     : uni-v2 style amm
+  - synth   : collateral backed synthetic asset
+  - sell    : nft auction
+```
 
 ## Developing
 
