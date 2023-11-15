@@ -17,8 +17,8 @@ contract ERC20 is Auth {
     mapping (address => uint)                      public balanceOf;
     mapping (address => mapping (address => uint)) public allowance;
 
-    event Approval(address indexed holder, address indexed spender, uint value);
-    event Transfer(address indexed from, address indexed to, uint value);
+    event Approval(address indexed src, address indexed dst, uint amt);
+    event Transfer(address indexed src, address indexed dst, uint amt);
 
     constructor(string memory symbol_, string memory name_) Auth(msg.sender) {
         symbol = symbol_;
@@ -28,11 +28,9 @@ contract ERC20 is Auth {
     // --- Token ---
 
     function transfer(address dst, uint amt) public returns (bool) {
-        transferFrom(msg.sender, dst, amt);
-        return true;
+        return transferFrom(msg.sender, dst, amt);
     }
-    function transferFrom(address src, address dst, uint amt)
-        public returns (bool)
+    function transferFrom(address src, address dst, uint amt) public returns (bool)
     {
         if (src != msg.sender && allowance[src][msg.sender] != type(uint).max) {
             allowance[src][msg.sender] -= amt;
@@ -61,4 +59,5 @@ contract ERC20 is Auth {
         totalSupply -= amt;
         emit Transfer(usr, address(0), amt);
     }
+
 }
