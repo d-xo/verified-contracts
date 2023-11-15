@@ -15,13 +15,9 @@
 
 pragma solidity >=0.8.0;
 
-contract ERC20 {
-    // --- Auth ---
+import {Auth} from "src/utils/auth.sol";
 
-    mapping (address => bool) public wards;
-    function rely(address usr) external auth { wards[usr] = true; }
-    function deny(address usr) external auth { wards[usr] = false; }
-    modifier auth { require(wards[msg.sender], "not-authorized"); _; }
+contract ERC20 is Auth {
 
     // --- ERC20 ---
 
@@ -36,10 +32,9 @@ contract ERC20 {
     event Approval(address indexed holder, address indexed spender, uint value);
     event Transfer(address indexed from, address indexed to, uint value);
 
-    constructor(string memory symbol_, string memory name_) {
+    constructor(string memory symbol_, string memory name_) Auth(msg.sender) {
         symbol = symbol_;
         name   = name_;
-        wards[msg.sender] = true;
     }
 
     // --- Token ---

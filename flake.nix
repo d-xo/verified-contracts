@@ -17,7 +17,7 @@
             pkgs.solc
           ];
           shellHook = ''
-            DAPP_SOLC=${solc}
+            export DAPP_SOLC=${solc}/bin/solc
           '';
         };
       });
