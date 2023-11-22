@@ -54,7 +54,7 @@ contract ERC20 is Auth {
         emit Transfer(address(0), usr, amt);
     }
     function burn(address usr, uint amt) public {
-        require(usr == msg.sender || wards[usr], "not-authorized");
+        require(usr == msg.sender || wards[usr] == 1, "not-authorized");
         balanceOf[usr] -= amt;
         totalSupply -= amt;
         emit Transfer(usr, address(0), amt);

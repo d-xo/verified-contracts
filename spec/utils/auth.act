@@ -1,22 +1,26 @@
 constructor of Auth
-interface constructor()
+interface constructor(address usr)
 iff
   CALLVALUE == 0
 creates
-  mapping(address => bool) wards := []
+  mapping(address => uint) wards := [ usr := 1 ]
 
 behaviour rely of Auth
 interface rely(address usr)
 iff
   CALLVALUE == 0
-  wards[usr]
+  wards[CALLER] == 1
 storage
-  wards[usr] => true
+  wards[usr] => 1
 
 behaviour deny of Auth
 interface deny(address usr)
 iff
   CALLVALUE == 0
-  wards[usr]
+  wards[CALLER] == 1
 storage
-  wards[usr] => false
+  wards[usr] => 0
+
+behaviour wards of Auth
+interface wards(address usr)
+returns wards[usr]
