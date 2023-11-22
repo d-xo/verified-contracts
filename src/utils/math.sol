@@ -2,7 +2,6 @@
 // SPDX-License-Identifier: AGPL-3.0-only
 
 pragma solidity >=0.8.0;
-pragma solidity ^0.8.6;
 
 // --- min / max ---
 
@@ -33,20 +32,20 @@ function add(Wad x, Wad y) pure returns (Wad) {
     return Wad.wrap(Wad.unwrap(x) + Wad.unwrap(y));
 }
 function add(Ray x, Ray y) pure returns (Ray) {
-    return Wad.wrap(Wad.unwrap(x) + Wad.unwrap(y));
+    return Ray.wrap(Ray.unwrap(x) + Ray.unwrap(y));
 }
 function add(Rad x, Rad y) pure returns (Rad) {
-    return Wad.wrap(Wad.unwrap(x) + Wad.unwrap(y));
+    return Rad.wrap(Rad.unwrap(x) + Rad.unwrap(y));
 }
 
 function sub(Wad x, Wad y) pure returns (Wad) {
     return Wad.wrap(Wad.unwrap(x) - Wad.unwrap(y));
 }
 function sub(Ray x, Ray y) pure returns (Ray) {
-    return Wad.wrap(Wad.unwrap(x) - Wad.unwrap(y));
+    return Ray.wrap(Ray.unwrap(x) - Ray.unwrap(y));
 }
 function sub(Rad x, Rad y) pure returns (Rad) {
-    return Wad.wrap(Wad.unwrap(x) - Wad.unwrap(y));
+    return Rad.wrap(Rad.unwrap(x) - Rad.unwrap(y));
 }
 
 function wmul(Wad x, Wad y) pure returns (Wad) {
