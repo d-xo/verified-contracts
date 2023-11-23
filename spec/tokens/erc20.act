@@ -11,7 +11,7 @@ contract ERC20 {
     mapping(address => bool) wards
   }
 
-  func constructor(string _symbol, string _name) {
+  func constructor(_symbol: string, _name: string) {
     storage {
       name        <- _name
       symbol      <- _symbol
@@ -24,7 +24,7 @@ contract ERC20 {
 
   // --- erc20 ---
 
-  func transfer(address dst, uint256 amt) -> bool {
+  fn transfer(dst: address, amt: uint256) -> bool {
     case CALLER == to {
       iff inrange(uint256, balanceOf[CALLER] - amt)
       returns true
@@ -35,66 +35,66 @@ contract ERC20 {
     }
   }
 
-  func transferFrom(address src, address dst, uint amt) -> bool {
+  fn transferFrom(src: address, dst: address, amt: uint) -> bool {
     case src == dst {
       iff inrange(uint256, balanceOf[src] - amt)
       returns true
     }
     case src =/= dst and CALLER == src {
       storage {
-        balanceOf[src] = balanceOf[src] - amt
-        balanceOf[dst] = balanceOf[dst] + amt
+        balanceOf[src] <- balanceOf[src] - amt
+        balanceOf[dst] <- balanceOf[dst] + amt
       }
       returns true
     }
     case src =/= dst and CALLER =/= src and allowance[src][CALLER] == MAX_UINT {
       storage {
-        balanceOf[src] = balanceOf[src] - amt
-        balanceOf[dst] = balanceOf[dst] + amt
+        balanceOf[src] <- balanceOf[src] - amt
+        balanceOf[dst] <- balanceOf[dst] + amt
       }
       returns true
     }
     case src =/= dst and CALLER =/= src and allowance[src][CALLER] < MAX_UINT {
       storage {
         allowance[src][CALLER] <- allowance[src][CALLER] - amt
-        balanceOf[src] = balanceOf[src] - amt
-        balanceOf[dst] = balanceOf[dst] + amt
+        balanceOf[src] <- balanceOf[src] - amt
+        balanceOf[dst] <- balanceOf[dst] + amt
       }
       returns true
     }
   }
 
-  func approve(address usr, uint amt) -> bool {
+  func approve(usr: address, amt: uint) -> bool {
     storage allowance[msg.sender][usr] = amt
     returns true
   }
 
   // --- admin ---
 
-  func mint(address usr, uint amt) {
+  func mint(usr: address, amt: uint) {
     iff wards[usr]
     storage {
       balanceOf[usr] <- balanceOf[usr] + amt
-      totalSupply <- totalSupply + amt
+      totalSupply    <- totalSupply + amt
     }
   }
 
-  func burn(address usr, uint amt) {
+  func burn(usr: address, amt: uint) {
     iff wards[msg.sender] || usr == msg.sender
     storage {
       balanceOf[usr] <- balanceOf[usr] - amt
-      totalSupply <- totalSupply - amt
+      totalSupply    <- totalSupply - amt
     }
   }
 
   // --- auth ---
 
-  func rely(address usr) {
+  func rely(usr: address) {
     iff wards[msg.sender]
     storage wards[usr] <- true
   }
 
-  func deny(address usr) {
+  func deny(usr: address) {
     iff wards[msg.sender]
     storage wards[usr] <- false
   }
