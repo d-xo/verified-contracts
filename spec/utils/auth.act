@@ -23,4 +23,5 @@ storage
 
 behaviour wards of Auth
 interface wards(address usr)
-returns wards[usr]
+iff CALLVALUE == 0
+returns pre(wards[usr])
